@@ -37,18 +37,18 @@ BRANCH_CODE_REPOSITORY="$2"
 BRANCH_REPORT_REPOSITORY="$4"
 
 get_repository_owner() {
-    echo "$1" | cut -d'/' -f4
+    echo "$1" | cut -d':' -f2
 }
 
 get_repository_name() {
-    echo "$1" | cut -d'/' -f5
+    echo "$1" | cut -d':' -f2
 }
 
-REPOSITORY_OWNER_USERNAME_CODE=$(get_repository_owner "$1")
-REPOSITORY_OWNER_USERNAME_REPORT=$(get_repository_owner "$3")
+REPOSITORY_OWNER_USERNAME_CODE=$(get_repository_owner "$1" | cut -d'/' -f1)
+REPOSITORY_OWNER_USERNAME_REPORT=$(get_repository_owner "$3" | cut -d'/' -f1 )
 
-CODE_REPOSYTORY_NAME=$(get_repository_name "$1")
-REPORT_REPOSYTORY_NAME=$(get_repository_name "$3")
+CODE_REPOSYTORY_NAME=$(get_repository_name "$1" | cut -d'/' -f2 |  cut -d'.' -f1)
+REPORT_REPOSYTORY_NAME=$(get_repository_name "$3"| cut -d'/' -f2 |  cut -d'.' -f1)
 
 CODE_REPOSITORY_PATH=$(mktemp --directory)
 REPORT_REPOSITORY_PATH=$(mktemp --directory)
@@ -197,6 +197,7 @@ while true; do
                 fi
 
                 github_post_request "https://api.github.com/repos/${REPOSITORY_OWNER_USERNAME_CODE}/${CODE_REPOSYTORY_NAME}/issues" $REQUEST_PATH $RESPONSE_PATH
+                #cat $RESPONSE_PATH
                 cat $RESPONSE_PATH | jq ".html_url"
                 rm $RESPONSE_PATH
                 rm $REQUEST_PATH
